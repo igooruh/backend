@@ -1,59 +1,66 @@
 const express = require('express');
+const { uuid } = require('uuidv4');
 
 const app = express();
 
 app.use(express.json());
 
+const projects = [];
+
 app.get('/projects', (request, response) => {
 
-    const { title, student } = request.query;
-    console.log(title);
-    console.log(student);
+    const { title } = request.query;
 
-    return response.json([
-        'Projeto 1',
-        'Projeto 2',
-        'Projeto 3',
-        'Projeto 4'
-    ]);
+    const results = title ? projects.filter(project => project.title.includes(title)) : projects;
+
+    return response.json(projects);
 });
 
 app.post('/projects', (request, response) => {
 
-    const body = request.body;
-    console.log(body);
+    const { title, student } = request.body;
+    const project = { id: uuid(), title, student };
 
-    return response.json([
-        'Projeto 1',
-        'Projeto 2',
-        'Projeto 3',
-        'Projeto 4',
-        'Projeto 5'
-    ]);
+    projects.push(project);
+
+    return response.json(project);
 });
 
 app.put('/projects/:id', (request, response) => {
 
-    const id = request.params;
+    const { id } = request.params;
+    const { title, student } = request.body;
 
-    console.log(id);
+    const projectIndex = projects.findIndex(project => project.id === id);
 
-    return response.json([
-        'Projeto 1',
-        'Projeto 2',
-        'Projeto 3',
-        'Projeto 4',
-        'Projeto 5'
-    ]);
+    if(projectIndex < 0) { 
+        return response.status(404).json({ error: 'Project not found.' });
+    }
+
+    const project = {
+        id,
+        title,
+        student
+    }
+
+    projects[projectIndex] = project;
+
+    return response.json(project);
 });
 
 app.delete('/projects/:id', (request, response) => {
-    return response.json([
-        'Projeto 1',
-        'Projeto 3',
-        'Projeto 4',
-        'Projeto 5'
-    ]);
+
+    const { id } = request.params;
+
+    const projectIndex = projects.findIndex(project => project.id === id);
+
+    if(projectIndex < 0) { 
+        return response.status(404).json({ error: 'Project not found.' });
+    }
+
+    projects.splice(projectIndex, 1);
+
+    return response.status(204).send();
 });
 
 app.listen(3333, () => console.log('🚀 Back-end started!'));
