@@ -1,5 +1,5 @@
 const express = require('express');
-const { uuid, isUuid } = require('uuidv4');
+const { v4: uuid, isUuid } = require('uuid');
 
 const app = express();
 
@@ -31,7 +31,7 @@ function validateProjectId(request, response, next) {
     return next();
 }
 
-app.use(logRequest);
+// app.use(logRequest);
 
 // Valida id por meio 
 // app.use('/projects/:id', validateProjectId);
